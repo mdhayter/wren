@@ -15,8 +15,15 @@ package(default_visibility = ["//visibility:public"])
 
 filegroup(
     name = "rtl_files",
+    # Only what FuseSoC and Verilator read, so that editing a BUILD file, defs.bzl or the
+    # documentation does not resynthesize the bitstream.
     srcs = glob(
-        ["**"],
+        [
+            "*.core",
+            "lint/**",
+            "rtl/**",
+            "util/**",
+        ],
     ) + [
         "@pavona_pavona//hw/top_egret:rtl_files",  # Add Egret RTL files for alert_handler_pkg and top_pkg
         "//hw/top_wren/data:all_files",

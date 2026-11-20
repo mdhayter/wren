@@ -28,7 +28,12 @@ source ../pavona/.venv/bin/activate
 util/regen.sh                      # once after a clone, and after any change to the sources
 ../pavona/.bin/bazelisk test @pavona_pavona//sw/device/examples/hello_world:hello_world_sim_verilator
 ../pavona/.bin/bazelisk build //hw/top_wren/bitstream:fpga_genesys2    # needs Vivado
+../pavona/.bin/bazelisk build //hw/top_wren/bitstream:fpga_genesys2_test_rom
 ```
+The second is the bitstream with the test ROM spliced in (Vivado's `updatemem`, seconds once the
+bitstream is built). Source the host's `vivado-env-*.sh` before every Bazel command, also those
+that need no Vivado: the environment is part of the bitstream actions' keys, so a run without it
+rebuilds them.
 Use the checkout's bazelisk (its `bazelisk.sh` changes to its own directory). `.bazelrc` makes
 Wren the top (`--@pavona_pavona//hw/top:top=wren`). Pavona's labels are
 `@pavona_pavona//...` from here; Wren's are `//hw/top_wren/...`. For host options, see
@@ -116,7 +121,9 @@ the checkout's build being present and up to date. Neither is worth doing for no
    splice ROM and OTP images into a bitstream.
 6. **Board.** Board-specific device libraries stay with the top (`sw/arch/`); Pavona has the
    exec env rule and device type for the board. The bitstream's `fusesoc_build` lists
-   `@pavona_pavona//hw:cores` and your top's `cores`.
+   `@pavona_pavona//hw:cores` and your top's `cores`. Keep the top's `rtl_files` to what FuseSoC
+   and Verilator read (cores, RTL, lint waivers, Vivado hooks, data), not `glob(["**"])`: with
+   BUILD files, `defs.bzl` or documentation in it, every edit to those resynthesizes.
 7. **Ignore the generated files** as `.gitignore` does here, then check that a fresh clone
    regenerates exactly the files you had: `git clone`, `util/regen.sh`, `diff -r`.
 

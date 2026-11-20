@@ -31,6 +31,8 @@ WREN = pavona_top(
     top_ld = str(Label("//hw/top_wren/sw/autogen:top_wren_memory")),
     # 64 KiB of flash: no room for the OTTF's non-volatile scratch and counters.
     ottf_no_nv_storage = True,
+    # Bitstream splicing: no OTP, and the ROM takes the unscrambled 32-bit image.
+    bitstream_splice = {"otp_size": 0, "rom_field": "rom32"},
     ips = WREN_IPS,
     instances = WREN_INSTANCES,
     secret_cfgs = {

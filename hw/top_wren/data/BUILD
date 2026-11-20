@@ -14,7 +14,10 @@ load("@pavona_pavona//rules:files.bzl", "copy_files")
 
 filegroup(
     name = "all_files",
-    srcs = glob(["**"]),
+    srcs = glob(
+        ["**"],
+        exclude = ["BUILD"],
+    ),
 )
 
 filegroup(
