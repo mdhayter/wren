@@ -1,0 +1,6 @@
+# Pavona's settings, then the ones that name the root module and must point at Pavona.
+import %workspace%/../pavona/.bazelrc
+build --workspace_status_command=../pavona/util/get_workspace_status.sh
+# Host options: Pavona's .bazelrc try-imports .bazelrc-site from this directory. If the Pavona
+# checkout has one, make it from that with the labels qualified:
+#   sed "s|--//|--@pavona_pavona//|" ../pavona/.bazelrc-site > .bazelrc-site

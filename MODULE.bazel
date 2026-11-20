@@ -1,0 +1,190 @@
+# Copyright Mark Hayter.
+# Licensed under the Apache License, Version 2.0, see LICENSE for details.
+# SPDX-License-Identifier: Apache-2.0
+
+# Out-of-tree Wren top (series W). Depends on the Pavona checkout next door.
+module(name = "pavona_wren")
+
+bazel_dep(name = "pavona_pavona")
+local_path_override(
+    module_name = "pavona_pavona",
+    path = "../pavona",
+)
+
+# Repositories named by flags in ../pavona/.bazelrc must be visible from the root module.
+bazel_dep(name = "rules_fuzzing", version = "0.8.0")
+bazel_dep(name = "rules_rust", version = "0.59.2")
+bazel_dep(name = "platforms", version = "1.0.0")
+bazel_dep(name = "rules_python", version = "2.2.0")
+bazel_dep(name = "rules_pkg", version = "1.0.1")
+
+# rules_python takes the default Python only from the root module; Pavona's wheels are cp312.
+python = use_extension("@rules_python//python/extensions:python.bzl", "python")
+python.toolchain(
+    ignore_root_user_error = True,
+    is_default = True,
+    python_version = "3.12",
+)
+
+# Bazel applies overrides only from the root module, so Pavona's are repeated here
+# (copied from ../pavona/MODULE.bazel; keep in step with it). Patches must be in the
+# root module, so third_party/*/patches are symlinks to the checkout.
+# Overrides and patches:
+single_version_override(
+    module_name = "rules_cc",
+    patch_strip = 1,
+    patches = [
+        "//third_party/cc/patches:remove_gold.patch",
+    ],
+    version = "0.2.18",
+)
+
+single_version_override(
+    module_name = "rules_rust",
+    patch_strip = 1,
+    patches = [
+        "//third_party/rust/patches:rules_rust.extra_rustc_toolchain_dirs.patch",
+    ],
+    version = "0.59.2",
+)
+
+single_version_override(
+    module_name = "rules_rust_bindgen",
+    patch_strip = 3,
+    patches = [
+        "//third_party/rust/patches:rules_rust.bindgen_static_lib.patch",
+    ],
+    version = "0.59.2",
+)
+
+single_version_override(
+    module_name = "rules_foreign_cc",
+    patches = [
+        # Patch to remove all build log file output when using rules_foreign_cc
+        # toolchains to ensure deterministic Bazel builds. See upstream issue:
+        # https://github.com/bazel-contrib/rules_foreign_cc/issues/1313
+        "//third_party/foreign_cc/patches:rules_foreign_cc.remove_log_output.patch",
+    ],
+    version = "0.9.0",
+)
+
+single_version_override(
+    module_name = "toolchains_llvm",
+    patch_strip = 1,
+    patches = [
+        # Patch to make the prebuilt lld and lldb run on distros that ship
+        # libxml2 >= 2.14, where the libxml2.so.2 soname no longer exists.
+        # Drop once the prebuilt binaries stop linking libxml2. See upstream
+        # issue: https://github.com/llvm/llvm-project/issues/113696
+        "//third_party/llvm/patches:toolchains_llvm.libxml2_shim.patch",
+    ],
+    version = "1.7.0",
+)
+
+# rules_rust takes toolchains only from the root module: copied from ../pavona/MODULE.bazel.
+# Rust toolchain:
+rust = use_extension("@rules_rust//rust:extensions.bzl", "rust")
+rust.repository_set(
+    name = "rust_host",
+    edition = "2024",
+    exec_triple = "x86_64-unknown-linux-gnu",
+    sha256s = {
+        "rustc-1.90.0-x86_64-unknown-linux-gnu.tar.xz": "48c2a42de9e92fcae8c24568f5fe40d5734696a6f80e83cc6d46eef1a78f13c9",
+        "clippy-1.90.0-x86_64-unknown-linux-gnu.tar.xz": "5b6466419693a05365827378145014a37ae74fb2948fab390d5210a524792ed8",
+        "cargo-1.90.0-x86_64-unknown-linux-gnu.tar.xz": "9853db03d68578a30972e2755c89c66aec035fec641cf8f3a7117c81eec2578d",
+        "llvm-tools-1.90.0-x86_64-unknown-linux-gnu.tar.xz": "1376ef6021578fcfe94fad66396f7ca6d2f19bda5a417f8746a2b32ccf3f4470",
+        "rust-std-1.90.0-x86_64-unknown-linux-gnu.tar.xz": "663f4ab7945b392d5e5294dec1b050a66820a20e86f084ec37eeb0f2f7ff5569",
+    },
+    target_compatible_with = [
+        "@platforms//cpu:x86_64",
+        "@platforms//os:linux",
+    ],
+    target_triple = "x86_64-unknown-linux-gnu",
+    versions = ["1.90.0"],
+)
+rust.repository_set(
+    name = "rust_host_aarch64",
+    edition = "2024",
+    exec_triple = "aarch64-unknown-linux-gnu",
+    sha256s = {
+        "rustc-1.90.0-aarch64-unknown-linux-gnu.tar.xz": "4e1a9987a11d7d91f0d5afbf5333feb62f44172e4a31f33ce7246549003217f2",
+        "clippy-1.90.0-aarch64-unknown-linux-gnu.tar.xz": "1a7f969c5712c17d960d6fba8235b33f264a9484b369dc388766a540f1ba464f",
+        "cargo-1.90.0-aarch64-unknown-linux-gnu.tar.xz": "bd8d1da6fe88ea7e29338f24277c22156267447adbfc47d690467ad32d02c2a7",
+        "llvm-tools-1.90.0-aarch64-unknown-linux-gnu.tar.xz": "3f559ee41cf201a818630b1877e53ee0b9cd32793ee99c297ef56225a8aeafd6",
+        "rust-std-1.90.0-aarch64-unknown-linux-gnu.tar.xz": "4952abb7d9d3ed7cea4f7ea44dcb23dc67631fae4ac44a5f059b90a4b5e9223f",
+    },
+    target_compatible_with = [
+        "@platforms//cpu:aarch64",
+        "@platforms//os:linux",
+    ],
+    target_triple = "aarch64-unknown-linux-gnu",
+    versions = ["1.90.0"],
+)
+rust.repository_set(
+    name = "rust_host_darwin_aarch64",
+    edition = "2024",
+    exec_triple = "aarch64-apple-darwin",
+    sha256s = {
+        "rustc-1.90.0-aarch64-apple-darwin.tar.xz": "89551c0ba1cc6d0312aebc4a6cafe4497223217ea8e87c81f6afbe127dfaeeb6",
+        "clippy-1.90.0-aarch64-apple-darwin.tar.xz": "3a0514b40b967810dd318a43cdc3d97bc47c3ad3844bde759c93223a28d56903",
+        "cargo-1.90.0-aarch64-apple-darwin.tar.xz": "17a4410a27bf7dad4765f3809265c225f25f8b009da3d4b76cd0927acdae04b5",
+        "llvm-tools-1.90.0-aarch64-apple-darwin.tar.xz": "2e0ee563d7033463b3198f04169b7803fbc053ef638fab951a2305f2c33b849e",
+        "rust-std-1.90.0-aarch64-apple-darwin.tar.xz": "c36777aec17d617f85f94b7cb87bdd4270eeca30ef38c6f686809d163c881609",
+    },
+    target_compatible_with = [
+        "@platforms//cpu:aarch64",
+        "@platforms//os:macos",
+    ],
+    target_triple = "aarch64-apple-darwin",
+    versions = ["1.90.0"],
+)
+rust.repository_set(
+    name = "rust_tock",
+    edition = "2021",
+    exec_triple = "x86_64-unknown-linux-gnu",
+    sha256s = {
+        "2023-07-30/rustc-nightly-x86_64-unknown-linux-gnu.tar.xz": "ecdee8821a57efbb699b7e3aa4cbfbd60b7970bce89a8cfb9bc7d65b9058ee42",
+        "2023-07-30/clippy-nightly-x86_64-unknown-linux-gnu.tar.xz": "76ee5aac81d1348bfebd3d94d5fb65c3f4ea0cf5fc2de834926f93772547380c",
+        "2023-07-30/cargo-nightly-x86_64-unknown-linux-gnu.tar.xz": "4ddb3ed2dd2acedf9097f4a1fe17b8cd571fdd7c9a49b1e31c228a284ec95049",
+        "2023-07-30/llvm-tools-nightly-x86_64-unknown-linux-gnu.tar.xz": "dc71b9ae6a4a4b9fa259724b29f4ad19467197ced89a8aad675f5af112c4fb77",
+        "2023-07-30/rust-std-nightly-riscv32imc-unknown-none-elf.tar.xz": "9790d50d4510443bbf4c13b68227a273345d28b84d29372bc5f5ea2d14d05f2d",
+        "2023-07-30/rust-std-nightly-x86_64-unknown-linux-gnu.tar.xz": "b5a589a243923c5fa2a1f08e7b902bb0a64ae08010067b9074501a6e1fb8b042",
+    },
+    target_compatible_with = [
+        "@platforms//cpu:riscv32",
+    ],
+    target_triple = "riscv32imc-unknown-none-elf",
+    # For RISC-V toolchain, we currently don't support LLVM 16+ due to old binutils version.
+    # Rust updated its LLVM 17 on 2023-08-08.
+    versions = ["nightly/2023-07-30"],
+)
+rust.repository_set(
+    name = "rust_tock_aarch64",
+    edition = "2021",
+    exec_triple = "aarch64-unknown-linux-gnu",
+    sha256s = {
+        "2023-07-30/rustc-nightly-aarch64-unknown-linux-gnu.tar.xz": "0de37244e50f6f0eb04064deecbd8a10f87f80de1adef26400db9bd1db0cb5f4",
+        "2023-07-30/clippy-nightly-aarch64-unknown-linux-gnu.tar.xz": "effe90fefd5752065c5ee4c3d9db59c4ee3d2bb7f9bedfb3f56a440cb4582e27",
+        "2023-07-30/cargo-nightly-aarch64-unknown-linux-gnu.tar.xz": "6d3a7f41e58e79801812b57df61f276ea6634873784166cccda9277805fc5d8b",
+        "2023-07-30/llvm-tools-nightly-aarch64-unknown-linux-gnu.tar.xz": "471abc44bc0bbb81ee7b084e73060a8b149667a9bf208614e22a3a961dad0d9d",
+        "2023-07-30/rust-std-nightly-riscv32imc-unknown-none-elf.tar.xz": "9790d50d4510443bbf4c13b68227a273345d28b84d29372bc5f5ea2d14d05f2d",
+        "2023-07-30/rust-std-nightly-aarch64-unknown-linux-gnu.tar.xz": "a415f05a3ddc83caa7b5f0372159a1c07ea0b076f1ee66430692787b327fc30f",
+    },
+    target_compatible_with = [
+        "@platforms//cpu:riscv32",
+    ],
+    target_triple = "riscv32imc-unknown-none-elf",
+    # For RISC-V toolchain, we currently don't support LLVM 16+ due to old binutils version.
+    # Rust updated its LLVM 17 on 2023-08-08.
+    versions = ["nightly/2023-07-30"],
+)
+use_repo(rust, "rust_toolchains")
+
+register_toolchains("@rust_toolchains//:all")
+
+# The Wren top, registered from outside Pavona.
+top_desc = use_extension("@pavona_pavona//hw/top:extensions.bzl", "top")
+top_desc.register(
+    bazel_file = "//hw/top_wren:defs.bzl",
+    top_var = "WREN",
+)

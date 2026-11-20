@@ -1,0 +1,1 @@
+../../../../pavona/hw/top_egret/rtl/usr_access_xil7series.sv

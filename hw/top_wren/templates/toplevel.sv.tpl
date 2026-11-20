@@ -1,0 +1,1 @@
+../../../../pavona/hw/top_egret/templates/toplevel.sv.tpl

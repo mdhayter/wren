@@ -1,0 +1,1 @@
+../../../../../../pavona/hw/top_egret/ip/ast/rtl/aon_clk.sv

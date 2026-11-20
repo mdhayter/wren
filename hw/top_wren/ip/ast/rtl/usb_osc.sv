@@ -1,0 +1,1 @@
+../../../../../../pavona/hw/top_egret/ip/ast/rtl/usb_osc.sv

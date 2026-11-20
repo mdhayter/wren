@@ -1,0 +1,1 @@
+../../../../pavona/hw/top_egret/util/vivado_hook_synth_design_pre.tcl
