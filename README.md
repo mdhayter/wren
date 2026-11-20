@@ -29,7 +29,8 @@ util/regen.sh                      # once after a clone, and after any change to
 ../pavona/.bin/bazelisk test @pavona_pavona//sw/device/examples/hello_world:hello_world_sim_verilator
 ../pavona/.bin/bazelisk build //hw/top_wren/bitstream:fpga_genesys2    # needs Vivado
 ```
-Use the checkout's bazelisk (its `bazelisk.sh` changes to its own directory). Pavona's labels are
+Use the checkout's bazelisk (its `bazelisk.sh` changes to its own directory). `.bazelrc` makes
+Wren the top (`--@pavona_pavona//hw/top:top=wren`). Pavona's labels are
 `@pavona_pavona//...` from here; Wren's are `//hw/top_wren/...`. For host options, see
 `.bazelrc`.
 
@@ -56,8 +57,8 @@ hooks and lint files, and `third_party/*/patches` (below).
 
 ## Making your own out-of-tree top
 
-1. **Module.** Copy `MODULE.bazel`, `.bazelrc`, `.bazelversion`, `BUILD.bazel` and
-   `third_party/`. `MODULE.bazel` repeats what Bazel takes only from the root module, so keep it
+1. **Module.** Copy `MODULE.bazel`, `.bazelrc` (set your top as `hw/top:top`), `.bazelversion`,
+   `BUILD.bazel` and `third_party/`. `MODULE.bazel` repeats what Bazel takes only from the root module, so keep it
    in step with `../pavona/MODULE.bazel`: Pavona's `single_version_override`s (their patches
    must be in the root repository, hence the `third_party/*/patches` symlinks), Python 3.12 as
    the default, the whole `rust` extension block, and direct deps on the repositories that

@@ -4,3 +4,6 @@ build --workspace_status_command=../pavona/util/get_workspace_status.sh
 # Host options: Pavona's .bazelrc try-imports .bazelrc-site from this directory. If the Pavona
 # checkout has one, make it from that with the labels qualified:
 #   sed "s|--//|--@pavona_pavona//|" ../pavona/.bazelrc-site > .bazelrc-site
+# This repository's top is the default; another registered top can still be chosen on the
+# command line.
+build --@pavona_pavona//hw/top:top=wren
