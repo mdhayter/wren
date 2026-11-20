@@ -70,21 +70,25 @@ hooks and lint files, and `third_party/*/patches` (below).
 The Pavona checkout's own `bazel-*` links point at a different output base. Nothing built here
 goes into the Pavona checkout, and `util/regen.sh` doesn't write there either.
 
-**Host tools are built twice.** Pavona's host tools don't depend on the top: they take it at run
-time with `--top` (a built-in top's name, or the path of a `top_<name>.host.json`). But a build
-here compiles them again under `external/pavona_pavona+/`. The shared remote cache doesn't help,
-because their output paths differ from those of the same targets built in the Pavona checkout.
-So the first test here rebuilds opentitantool and its Rust dependencies, and so does every
-change of Pavona that touches them.
+**Host tools are built twice.** Pavona's host tools don't depend on the top: they take it at
+run time with `--top`. But a build here compiles them again under `external/pavona_pavona+/`, in
+this repository's output base, rather than reusing the Pavona checkout's. The cost is small,
+measured on a 16-core host, building opentitantool and a Rust test harness (`usb_harness`) from
+an empty output base with the remote cache off:
+- about a minute in all: 742 actions, about 60 s wall time;
+- 649 of the actions are third-party crates (about 220 s of summed run time). They are built once
+  per output base, so only again after a clean or on a new machine;
+- 93 are Pavona's own host code (about 55 s summed). These are rebuilt here after a Pavona change
+  that touches them, as they are in the checkout.
 
-**Plan (not done yet):** use the host tools built in the Pavona checkout. Pavona gets them through
-a toolchain (`localtools`, in `rules/pavona/toolchain.bzl`) whose tools are attributes. A
-toolchain registered here, in the root module, would take precedence over Pavona's. It would
-point those attributes at the checkout's built tools, and Wren's exec envs would pass
-`--top=<path of top_wren.host.json>` instead of `--top=wren`. A tool built in Pavona has only
-Pavona's tops built in, so it needs the path. The tools would then be built once, in the
-checkout, by `./bazelisk.sh build //sw/host/opentitantool` there. The cost: building here would
-depend on that build being present and up to date (non-hermetic).
+Sharing a Bazel disk cache with the checkout (`--disk_cache`) saves nothing today: 0 hits. Each
+C and Rust action takes the LLVM toolchain as an input. That toolchain's repository has a
+different name depending on which module is the root (`+pavona_llvm+llvm_toolchain` in Pavona,
+`pavona_pavona++pavona_llvm+llvm_toolchain` here), so every action key differs. Pavona's own
+code could not hit in any case, since its paths differ. Using the checkout's built tools instead,
+through a toolchain registered here, would avoid only opentitantool's part of the 93 actions.
+Tests with their own Rust harness still build opentitanlib, and builds here would then depend on
+the checkout's build being present and up to date. Neither is worth doing for now.
 
 ## Making your own out-of-tree top
 
