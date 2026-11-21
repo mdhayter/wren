@@ -114,9 +114,10 @@ sim_verilator(
 # The fpga_genesys2 target is only meant to be used for building ROMs and
 # other items without `testonly=True`.
 #
-# Tests run through the board's FT2232H (interface `ftdi_genesys2`): load the
-# bitstream over JTAG (skipped when the ROM reports the same bitstream already
-# loaded), bootstrap over spi_device, then the console.
+# Tests run through the board's FT2232H (interface `ftdi_genesys2`, with Wren's
+# pins in sw/ftdi_genesys2.json5): load the bitstream over JTAG (skipped when the
+# ROM reports the same bitstream already loaded), bootstrap over spi_device, then
+# the console.
 ###########################################################################
 fpga_genesys2(
     name = "fpga_genesys2",
@@ -139,9 +140,11 @@ fpga_genesys2(
         "--logging=info",
         "--top=wren",
         "--interface={interface}",
+        "--conf=$(rootpath //hw/top_wren/sw:ftdi_genesys2.json5)",
     ],
     base = ":fpga_genesys2",
     base_bitstream = "//hw/top_wren/bitstream:genesys2_bitstream",
+    data = ["//hw/top_wren/sw:ftdi_genesys2.json5"],
     exec_env = "fpga_genesys2_test_rom",
     mmi = "//hw/top_wren/bitstream:genesys2_mmi",
     param = {

@@ -1,6 +1,5 @@
 # Copyright lowRISC contributors (OpenTitan project).
 # Copyright Mark Hayter.
-# Copyright Mark Hayter.
 # Licensed under the Apache License, Version 2.0, see LICENSE for details.
 # SPDX-License-Identifier: Apache-2.0
 
@@ -12,6 +11,10 @@ filegroup(
     name = "all_files",
     srcs = glob(["**"]),
 )
+
+# The opentitantool configuration of Wren on the Genesys 2 (the pins of its reset
+# and straps), on top of the board's built-in ftdi_genesys2 configuration.
+exports_files(["ftdi_genesys2.json5"])
 
 # Which pads test software uses: see sw/device/lib/testing/test_pinout.h.
 cc_library(

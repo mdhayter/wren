@@ -1,0 +1,79 @@
+// Copyright Mark Hayter.
+// Licensed under the Apache License, Version 2.0, see LICENSE for details.
+// SPDX-License-Identifier: Apache-2.0
+
+// Wren on a Digilent Genesys 2: the board's configuration (SPI on ADBUS0-3, the
+// console) plus the pins Wren's FPGA build wires to the FT2232H's channel A
+// (data/*.xdc): ADBUS7 is the reset, ADBUS4-6 are the three software straps.
+//
+// This does not include pavona.json5: Wren has no TAP strap pads (the chip
+// file ties the TAP selection), no life cycle controller and no sysrst_ctrl,
+// so only the reset and the software straps are defined.
+//
+// The straps are active low at the board (the chip file inverts them, so the
+// FTDI's idle pull-ups do not request bootstrap), hence `invert` here.
+{
+  "includes": ["/__builtin__/pavona_ftdi_genesys2.json5"],
+  "pins": [
+    {
+      "name": "RESET",
+      "mode": "PushPull",
+      "level": true,
+      "invert": false,
+      "pull_mode": "None",
+      "alias_of": "adbus7"
+    },
+    {
+      "name": "SW_STRAP0",
+      "mode": "PushPull",
+      "level": false,
+      "invert": true,
+      "pull_mode": "None",
+      "alias_of": "adbus4"
+    },
+    {
+      "name": "SW_STRAP1",
+      "mode": "PushPull",
+      "level": false,
+      "invert": true,
+      "pull_mode": "None",
+      "alias_of": "adbus5"
+    },
+    {
+      "name": "SW_STRAP2",
+      "mode": "PushPull",
+      "level": false,
+      "invert": true,
+      "pull_mode": "None",
+      "alias_of": "adbus6"
+    }
+  ],
+  "strappings": [
+    {
+      "name": "ROM_BOOTSTRAP",
+      "pins": [
+        {
+          "name": "SW_STRAP0",
+          "level": true
+        },
+        {
+          "name": "SW_STRAP1",
+          "level": true
+        },
+        {
+          "name": "SW_STRAP2",
+          "level": true
+        }
+      ]
+    },
+    {
+      "name": "RESET",
+      "pins": [
+        {
+          "name": "RESET",
+          "level": false
+        }
+      ]
+    }
+  ]
+}
