@@ -29,8 +29,14 @@ util/regen.sh                      # once after a clone, and after any change to
 ../pavona/.bin/bazelisk test @pavona_pavona//sw/device/examples/hello_world:hello_world_sim_verilator
 ../pavona/.bin/bazelisk build //hw/top_wren/bitstream:fpga_genesys2    # needs Vivado
 ../pavona/.bin/bazelisk build //hw/top_wren/bitstream:fpga_genesys2_test_rom
+../pavona/.bin/bazelisk test //hw/top_wren/sw/tests:hello_world_fpga_genesys2_test_rom   # Genesys 2 attached
 ```
-The second is the bitstream with the test ROM spliced in (Vivado's `updatemem`, seconds once the
+Board tests live in `hw/top_wren/sw/tests/`: Pavona's tests ask for environments by role and
+reach only Wren's Verilator environment, so Wren builds Pavona's test sources for its board
+environments there. The first `bazel test` on the board synthesizes once more, for the test's
+configuration (the universal splice, as Egret's tests use).
+
+The second build is the bitstream with the test ROM spliced in (Vivado's `updatemem`, seconds once the
 bitstream is built). Source the host's `vivado-env-*.sh` before every Bazel command, also those
 that need no Vivado: the environment is part of the bitstream actions' keys, so a run without it
 rebuilds them.
