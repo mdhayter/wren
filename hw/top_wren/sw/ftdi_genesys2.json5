@@ -2,18 +2,27 @@
 // Licensed under the Apache License, Version 2.0, see LICENSE for details.
 // SPDX-License-Identifier: Apache-2.0
 
-// Wren on a Digilent Genesys 2: the board's configuration (SPI on ADBUS0-3, the
-// console) plus the pins Wren's FPGA build wires to the FT2232H's channel A
-// (data/*.xdc): ADBUS7 is the reset, ADBUS4-6 are the three software straps.
+// Wren on a Digilent Genesys 2, through the FT2232H on the USB PROG port.
+// Channel A: ADBUS0-3 carry SPI to spi_device, ADBUS4-6 are the three
+// software straps and ADBUS7 is the reset (data/*.xdc). Channel B is the
+// board's JTAG cable, for loading the bitstream.
 //
-// This does not include pavona.json5: Wren has no TAP strap pads (the chip
-// file ties the TAP selection), no life cycle controller and no sysrst_ctrl,
-// so only the reset and the software straps are defined.
+// This does not include Pavona's /__builtin__/pavona_ftdi_genesys2.json5: it
+// mirrors that file's SPI and console (keep them in step with it), except that
+// the console is opened by name rather than as the first FT232R. Wren's test
+// setup adds a second FT232R, a PmodUSBUART on Pmod JC (uart1's pads, the
+// `dut` UART of the UART tests), with the same USB strings as the board's
+// own, and /dev/ttyUSBn follows enumeration order. So both are opened by
+// names that a udev rule on the host gives them from their serial numbers
+// (README, "Genesys 2 setup"). Nor does it include pavona.json5: Wren has no
+// TAP strap pads (the chip file ties the TAP selection), no life cycle
+// controller and no sysrst_ctrl, so only the reset and the software straps
+// are defined.
 //
 // The straps are active low at the board (the chip file inverts them, so the
 // FTDI's idle pull-ups do not request bootstrap), hence `invert` here.
 {
-  "includes": ["/__builtin__/pavona_ftdi_genesys2.json5"],
+  "interface": "ftdi_genesys2",
   "pins": [
     {
       "name": "RESET",
@@ -75,5 +84,26 @@
         }
       ]
     }
-  ]
+  ],
+  "spi": [
+    {
+      "name": "BOOTSTRAP"
+    }
+  ],
+  "uarts": [
+    {
+      "name": "console",
+      "baudrate": 115200,
+      "parity": "None",
+      "stopbits": "Stop1",
+      "alias_of": "/dev/genesys2-console"
+    },
+    {
+      "name": "dut",
+      "alias_of": "/dev/genesys2-dut"
+    }
+  ],
+  "provides": {
+    "chip": "opentitan"
+  }
 }

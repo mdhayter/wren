@@ -29,7 +29,7 @@ util/regen.sh                      # once after a clone, and after any change to
 ../pavona/.bin/bazelisk test @pavona_pavona//sw/device/examples/hello_world:hello_world_sim_verilator
 ../pavona/.bin/bazelisk build //hw/top_wren/bitstream:fpga_genesys2    # needs Vivado
 ../pavona/.bin/bazelisk build //hw/top_wren/bitstream:fpga_genesys2_test_rom
-../pavona/.bin/bazelisk test //hw/top_wren/sw/tests:hello_world_fpga_genesys2_test_rom   # Genesys 2 attached
+../pavona/.bin/bazelisk test //hw/top_wren/sw/tests:hello_world_fpga_genesys2_test_rom   # Genesys 2 attached (see "Genesys 2 setup")
 ```
 Board tests live in `hw/top_wren/sw/tests/`: Pavona's tests ask for environments by role and
 reach only Wren's Verilator environment, so Wren builds Pavona's test sources for its board
@@ -44,6 +44,26 @@ Use the checkout's bazelisk (its `bazelisk.sh` changes to its own directory). `.
 Wren the top (`--@pavona_pavona//hw/top:top=wren`). Pavona's labels are
 `@pavona_pavona//...` from here; Wren's are `//hw/top_wren/...`. For host options, see
 `.bazelrc`.
+
+## Genesys 2 setup
+
+Board tests use the FT2232H on the board's USB PROG port (JTAG for the bitstream; SPI, reset and
+straps for bootstrap) and two FT232R UARTs: the board's USB UART port (the console, uart0) and a
+[PmodUSBUART](https://digilent.com/reference/pmod/pmodusbuart/start) on Pmod JC (uart1, the `dut`
+UART of the UART tests). The two FT232Rs report the same USB strings and their `/dev/ttyUSBn`
+numbers follow enumeration order, so `hw/top_wren/sw/ftdi_genesys2.json5` opens them as
+`/dev/genesys2-console` and `/dev/genesys2-dut`. Once per board and host, give them those names
+with a udev rule keyed by their serial numbers:
+```sh
+udevadm info -q property -n /dev/ttyUSB0 | grep SERIAL_SHORT    # for each FT232R's ttyUSBn
+sudo tee /etc/udev/rules.d/99-genesys2.rules <<'EOF'
+SUBSYSTEM=="tty", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6001", ATTRS{serial}=="<board UART serial>", SYMLINK+="genesys2-console"
+SUBSYSTEM=="tty", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6001", ATTRS{serial}=="<PmodUSBUART serial>", SYMLINK+="genesys2-dut"
+EOF
+sudo udevadm control --reload-rules && sudo udevadm trigger --subsystem-match=tty
+```
+The rule is needed even without the PmodUSBUART (the console is always opened by name). The user
+running the tests needs access to the FTDI devices (on Ubuntu, the `plugdev` group).
 
 ## Sources and generated files
 
