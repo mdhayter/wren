@@ -29,12 +29,13 @@ util/regen.sh                      # once after a clone, and after any change to
 ../pavona/.bin/bazelisk test @pavona_pavona//sw/device/examples/hello_world:hello_world_sim_verilator
 ../pavona/.bin/bazelisk build //hw/top_wren/bitstream:fpga_genesys2    # needs Vivado
 ../pavona/.bin/bazelisk build //hw/top_wren/bitstream:fpga_genesys2_test_rom
-../pavona/.bin/bazelisk test //hw/top_wren/sw/tests:hello_world_fpga_genesys2_test_rom   # Genesys 2 attached (see "Genesys 2 setup")
+../pavona/.bin/bazelisk test @pavona_pavona//sw/device/examples/hello_world:hello_world_fpga_genesys2_test_rom   # Genesys 2 attached (see "Genesys 2 setup")
 ```
-Board tests live in `hw/top_wren/sw/tests/`: Pavona's tests ask for environments by role and
-reach only Wren's Verilator environment, so Wren builds Pavona's test sources for its board
-environments there. The first `bazel test` on the board synthesizes once more, for the test's
-configuration (the universal splice, as Egret's tests use).
+Wren maps Pavona's test roles to its environments (`test_envs` in `hw/top_wren/defs.bzl`), so
+Pavona's tests that ask for a role, and whose IPs Wren has, get Wren targets: `fpga_test_rom` gives
+`..._fpga_genesys2_test_rom`, `sim_verilator` gives `..._sim_verilator`. The first `bazel test` on
+the board synthesizes once more, for the test's configuration (the universal splice, as Egret's
+tests use).
 
 The second build is the bitstream with the test ROM spliced in (Vivado's `updatemem`, seconds once the
 bitstream is built). Source the host's `vivado-env-*.sh` before every Bazel command, also those

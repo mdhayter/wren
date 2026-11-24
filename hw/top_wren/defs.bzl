@@ -14,6 +14,7 @@ WREN = pavona_top(
     test_pinout = str(Label("//hw/top_wren/sw:test_pinout")),
     # Execution environments by role, for pavona_test_envs().
     test_envs = {
+        "fpga_test_rom": str(Label("//hw/top_wren:fpga_genesys2_test_rom")),
         "sim_verilator": str(Label("//hw/top_wren:sim_verilator")),
     },
     # Environments the test ROM is built for.

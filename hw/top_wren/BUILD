@@ -140,7 +140,8 @@ fpga_genesys2(
         "--logging=info",
         "--top=wren",
         "--interface={interface}",
-        "--conf=$(rootpath //hw/top_wren/sw:ftdi_genesys2.json5)",
+        # The label names this repository: Pavona's tests expand it in their own packages.
+        "--conf=$(rootpath @@//hw/top_wren/sw:ftdi_genesys2.json5)",
     ],
     base = ":fpga_genesys2",
     base_bitstream = "//hw/top_wren/bitstream:genesys2_bitstream",
