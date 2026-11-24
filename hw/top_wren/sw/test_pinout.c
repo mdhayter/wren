@@ -88,6 +88,23 @@ const dt_pad_t kPinmuxTestutilsGpioPads[kDifGpioNumPins] = {
     kDtPadIoa0,  kDtPadIoa1,  kDtPadIoa2,  kDtPadIoa4,  kDtPadIor5,
     kDtPadIor7,  kDtPadIoc8};
 
+uint32_t test_pinout_testable_gpios_mask(void) {
+  switch (kDeviceType) {
+    case kDeviceSimDV:
+    case kDeviceSimVerilator:
+      // All GPIOs are testable in simulation.
+      return 0xffffffff;
+    case kDeviceFpgaGenesys2:
+      // The LEDs (GPIO 0-7) and Pmod JA7 (GPIO 21). The switches, buttons and
+      // straps are driven by the board, the OLED controls switch its power,
+      // and GPIO 29-31 have no pads.
+      return 0x002000ff;
+    default:
+      CHECK(false);
+      return 0;
+  }
+}
+
 status_t test_pinout_uart_pads(dt_uart_t uart_dt, uart_pinmux_channel_t channel,
                                dt_pad_t *rx_pad, dt_pad_t *tx_pad) {
   // For DV platform, each UART has its own specific mapping
