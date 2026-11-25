@@ -23,6 +23,12 @@ const test_pinout_init_t kTestPinoutInit = {
     .straps = {kDtPadIoc0, kDtPadIoc1, kDtPadIoc2},
 };
 
+// VBUS sense on Pmod JB10 (the Dual USB PMOD's J1).
+const dt_pad_t kTestPinoutUsbdevSense = kDtPadIoc7;
+
+// The Dual USB PMOD has no differential receiver (`usb_rx_d` tied to 0).
+const bool kTestPinoutUsbdevHasDiffRcvr = false;
+
 void test_pinout_init_extra(dif_pinmux_t *pinmux) {
   // Enable pull-ups on UART0 RX
   // Pull-ups are available only on certain platforms.
