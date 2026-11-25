@@ -13,6 +13,41 @@ load(
 
 package(default_visibility = ["//visibility:public"])
 
+# The Egret files that Wren's cores use, not the whole of Egret: an edit
+# elsewhere in hw/top_egret (its software, say) would otherwise rebuild
+# Wren's Verilator model and bitstream. These are the cores
+# lowrisc:systems:top_egret_padring, lowrisc:systems:top_egret_physical_pads,
+# lowrisc:egret_systems:scan_role_pkg, lowrisc:egret_ip:alert_handler_pkg and
+# lowrisc:egret_constants:top_pkg, and the ones they depend on in Egret
+# (lowrisc:systems:top_egret_pkg). Also Egret's testing lc_ctrl token
+# package (lowrisc:egret_constants:testing_lc_ctrl_token_pkg): Wren has no
+# lc_ctrl, but top_wren depends on lowrisc:ip:lc_ctrl for its types, which
+# needs a provider of lowrisc:virtual_constants:lc_ctrl_token_pkg.
+# Keep in step with those cores.
+filegroup(
+    name = "egret_rtl_files",
+    srcs = [
+        "@pavona_pavona//hw/top_egret/ip_autogen/alert_handler/rtl:alert_handler_pkg.sv",
+        "@pavona_pavona//hw/top_egret/ip_autogen/alert_handler/rtl:alert_handler_reg_pkg.sv",
+        "@pavona_pavona//hw/top_egret/ip_autogen/alert_handler:alert_handler_pkg.core",
+        "@pavona_pavona//hw/top_egret:lint/padring.waiver",
+        "@pavona_pavona//hw/top_egret:lint/top_egret_pkg.vlt",
+        "@pavona_pavona//hw/top_egret:lint/top_egret_pkg.waiver",
+        "@pavona_pavona//hw/top_egret:padring.core",
+        "@pavona_pavona//hw/top_egret:physical_pads.core",
+        "@pavona_pavona//hw/top_egret:rtl/autogen/testing/lc_ctrl_token_pkg.sv",
+        "@pavona_pavona//hw/top_egret:rtl/autogen/testing/top_egret_testing_lc_ctrl_token_pkg.core",
+        "@pavona_pavona//hw/top_egret:rtl/autogen/top_egret_pkg.sv",
+        "@pavona_pavona//hw/top_egret:rtl/padring.sv",
+        "@pavona_pavona//hw/top_egret:rtl/physical_pads.sv",
+        "@pavona_pavona//hw/top_egret:rtl/scan_role_pkg.sv",
+        "@pavona_pavona//hw/top_egret:rtl/top_pkg.sv",
+        "@pavona_pavona//hw/top_egret:scan_role_pkg.core",
+        "@pavona_pavona//hw/top_egret:top_egret_pkg.core",
+        "@pavona_pavona//hw/top_egret:top_pkg.core",
+    ],
+)
+
 filegroup(
     name = "rtl_files",
     # Only what FuseSoC and Verilator read, so that editing a BUILD file, defs.bzl or the
@@ -25,7 +60,7 @@ filegroup(
             "util/**",
         ],
     ) + [
-        "@pavona_pavona//hw/top_egret:rtl_files",  # Add Egret RTL files for alert_handler_pkg and top_pkg
+        ":egret_rtl_files",
         "//hw/top_wren/data:all_files",
         "//hw/top_wren/dv/verilator:all_files",
         "//hw/top_wren/ip:rtl_files",

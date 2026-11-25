@@ -19,7 +19,6 @@ fusesoc_build(
     testonly = True,
     srcs = [
         "@pavona_pavona//hw:rtl_files",
-        "@pavona_pavona//hw/top_egret:rtl_files",  # Add Egret RTL files for alert_handler_pkg and the padring
         "//hw/top_wren:rtl_files",
     ],
     cores = [
