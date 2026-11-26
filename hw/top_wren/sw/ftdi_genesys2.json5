@@ -56,6 +56,16 @@
       "invert": true,
       "pull_mode": "None",
       "alias_of": "acbus5"
+    },
+    // The pins of pwm_smoketest, where the test pinout puts them
+    // (kTestPinoutPwmTestPads): IOR5 and IOR7 on ADBUS4-5.
+    {
+      "name": "PWM_OUT",
+      "alias_of": "adbus4"
+    },
+    {
+      "name": "PWM_SAMPLE_START",
+      "alias_of": "adbus5"
     }
   ],
   "strappings": [

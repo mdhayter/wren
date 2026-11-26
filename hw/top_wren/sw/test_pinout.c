@@ -32,6 +32,14 @@ const bool kTestPinoutUsbdevHasDiffRcvr = false;
 // I2C0 on Pmod JA3 (SCL, IOB11) and JA4 (SDA, IOB12): the PmodHYGRO.
 const dt_i2c_t kTestPinoutPmodI2c = kDtI2c0;
 
+// The PWM test's pads are GPIO 29-30's: PWM out on IOR5 (FT2232H ADBUS4),
+// sample start on IOR7 (ADBUS5), which the host samples and drives with
+// bit-banging.
+const test_pinout_pwm_test_pads_t kTestPinoutPwmTestPads = {
+    .pwm = kDtPadIor5,
+    .sample_start = kDtPadIor7,
+};
+
 void test_pinout_init_extra(dif_pinmux_t *pinmux) {
   // Enable pull-ups on UART0 RX
   // Pull-ups are available only on certain platforms.
