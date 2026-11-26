@@ -3,8 +3,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 // Wren on a Digilent Genesys 2, through the FT2232H on the USB PROG port.
-// Channel A: ADBUS0-3 carry SPI to spi_device, ADBUS4-6 are the three
-// software straps and ADBUS7 is the reset (data/*.xdc). Channel B is the
+// Channel A: ADBUS0-3 carry SPI to spi_device, ADBUS4-5 are GPIO 29-30
+// (for sampling with bit-banging), ACBUS0, ACBUS3 and ACBUS5 are the three
+// software straps and ACBUS6 is the reset (data/*.xdc). Channel B is the
 // board's JTAG cable, for loading the bitstream.
 //
 // This does not include Pavona's /__builtin__/pavona_ftdi_genesys2.json5: it
@@ -30,7 +31,7 @@
       "level": true,
       "invert": false,
       "pull_mode": "None",
-      "alias_of": "adbus7"
+      "alias_of": "acbus6"
     },
     {
       "name": "SW_STRAP0",
@@ -38,7 +39,7 @@
       "level": false,
       "invert": true,
       "pull_mode": "None",
-      "alias_of": "adbus4"
+      "alias_of": "acbus0"
     },
     {
       "name": "SW_STRAP1",
@@ -46,7 +47,7 @@
       "level": false,
       "invert": true,
       "pull_mode": "None",
-      "alias_of": "adbus5"
+      "alias_of": "acbus3"
     },
     {
       "name": "SW_STRAP2",
@@ -54,7 +55,7 @@
       "level": false,
       "invert": true,
       "pull_mode": "None",
-      "alias_of": "adbus6"
+      "alias_of": "acbus5"
     }
   ],
   "strappings": [

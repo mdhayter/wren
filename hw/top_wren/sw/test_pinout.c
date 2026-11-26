@@ -86,8 +86,8 @@ void test_pinout_init_extra(dif_pinmux_t *pinmux) {
 // supports. This oversubscription is intentional to maximize testing.
 // Wren's GPIOs follow the Genesys 2 board: 0-7 LEDs, 8-15 switches, 16-20
 // buttons, 21 Pmod JA7, 22-24 the straps, and 25-28 the OLED's DC, RES#, VDD
-// and VBAT enables. 29-31 have no board pin: their pads are removed in the
-// genesys2 target.
+// and VBAT enables. 29-30 are on the FT2232H's ADBUS4-5; 31 has no board pin:
+// its pad (IOC8, a TAP strap) is removed in the genesys2 target.
 const dt_pad_t kPinmuxTestutilsGpioPads[kDifGpioNumPins] = {
     kDtPadIob0,  kDtPadIob1,  kDtPadIob2,  kDtPadIob3,  kDtPadIob6,
     kDtPadIob7,  kDtPadIob8,  kDtPadIoc9,  kDtPadIor10, kDtPadIor11,
@@ -104,10 +104,11 @@ uint32_t test_pinout_testable_gpios_mask(void) {
       // All GPIOs are testable in simulation.
       return 0xffffffff;
     case kDeviceFpgaGenesys2:
-      // The LEDs (GPIO 0-7) and Pmod JA7 (GPIO 21). The switches, buttons and
-      // straps are driven by the board, the OLED controls switch its power,
-      // and GPIO 29-31 have no pads.
-      return 0x002000ff;
+      // The LEDs (GPIO 0-7), Pmod JA7 (GPIO 21) and the FT2232H's ADBUS4-5
+      // (GPIO 29-30, inputs on the FTDI side unless a host test drives them).
+      // The switches, buttons and straps are driven by the board, the OLED
+      // controls switch its power, and GPIO 31 has no pad.
+      return 0x602000ff;
     default:
       CHECK(false);
       return 0;

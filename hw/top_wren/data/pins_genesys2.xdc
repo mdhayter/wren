@@ -17,8 +17,9 @@ set_property -dict { PACKAGE_PIN AD11  IOSTANDARD LVDS } [get_ports { IO_CLK_N }
 ## Resets
 # CPU reset button, active low.
 set_property -dict { PACKAGE_PIN R19   IOSTANDARD LVCMOS33 } [get_ports { POR_N }];
-# FT2232H channel A ADBUS7 (PROG_D7, RI#): an FTDI input in UART mode, so pull it up.
-set_property -dict { PACKAGE_PIN AA26  IOSTANDARD LVCMOS33 PULLTYPE PULLUP } [get_ports { IO_FTDI_RST_N }];
+# FT2232H channel A ACBUS6 (PROG_OEN). Not driven in FTDI bit-bang modes (pulled
+# up there, as here), so bit-banging ADBUS never resets the chip.
+set_property -dict { PACKAGE_PIN AC30  IOSTANDARD LVCMOS33 PULLTYPE PULLUP } [get_ports { IO_FTDI_RST_N }];
 
 ## LEDs (GPIO 0-7)
 set_property -dict { PACKAGE_PIN T28   IOSTANDARD LVCMOS33 } [get_ports { IOB0 }]; # LED0
@@ -50,12 +51,19 @@ set_property -dict { PACKAGE_PIN C19   IOSTANDARD LVCMOS18 } [get_ports { IOC6 }
 ## Spare GPIO 21 on Pmod JA7
 set_property -dict { PACKAGE_PIN T22   IOSTANDARD LVCMOS33 } [get_ports { IOR6 }];  # JA7
 
-## Boot straps (GPIO 22-24) on FT2232H channel A ADBUS4-6 (PROG_D4-D6).
-## Active low at the board and inverted in the chip level. Pulled up, since
-## ADBUS5-6 are FTDI inputs in UART mode.
-set_property -dict { PACKAGE_PIN Y29   IOSTANDARD LVCMOS33 PULLTYPE PULLUP } [get_ports { IOC0 }];
-set_property -dict { PACKAGE_PIN Y28   IOSTANDARD LVCMOS33 PULLTYPE PULLUP } [get_ports { IOC1 }];
-set_property -dict { PACKAGE_PIN AA28  IOSTANDARD LVCMOS33 PULLTYPE PULLUP } [get_ports { IOC2 }];
+## Boot straps (GPIO 22-24) on FT2232H channel A ACBUS0, ACBUS3 and ACBUS5
+## (PROG_RXFN, PROG_WRN, PROG_CLKO). Active low at the board and inverted in
+## the chip level. These ACBUS pins are not driven in FTDI bit-bang modes and
+## float high on its pull-ups, the inactive level; pulled up here too.
+set_property -dict { PACKAGE_PIN AB29  IOSTANDARD LVCMOS33 PULLTYPE PULLUP } [get_ports { IOC0 }]; # ACBUS0
+set_property -dict { PACKAGE_PIN AC27  IOSTANDARD LVCMOS33 PULLTYPE PULLUP } [get_ports { IOC1 }]; # ACBUS3
+set_property -dict { PACKAGE_PIN AB27  IOSTANDARD LVCMOS33 PULLTYPE PULLUP } [get_ports { IOC2 }]; # ACBUS5
+
+## GPIO 29-30 on FT2232H channel A ADBUS4-5 (PROG_D4-D5), which the host can
+## sample with FTDI synchronous bit-bang. Pulled up for a defined level while
+## neither side drives them.
+set_property -dict { PACKAGE_PIN Y29   IOSTANDARD LVCMOS33 PULLTYPE PULLUP } [get_ports { IOR5 }]; # ADBUS4
+set_property -dict { PACKAGE_PIN Y28   IOSTANDARD LVCMOS33 PULLTYPE PULLUP } [get_ports { IOR7 }]; # ADBUS5
 
 ## OLED (SSD1306): control lines on GPIO 25-28, SPI on spi_host1.
 ## No pulls: the board's pull-ups keep VDD and VBAT off while the pads float.

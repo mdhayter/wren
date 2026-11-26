@@ -1143,12 +1143,14 @@
           'SPI_HOST_D0', 'SPI_HOST_D1', 'SPI_HOST_D2', 'SPI_HOST_D3',
           // The FT2232H's DSPI port carries single-lane SPI only.
           'SPI_DEV_D2', 'SPI_DEV_D3',
-          // TAP and DFT straps: the chip level ties the TAP strap to rv_dm.
-          'IOC5', 'IOC8', 'IOR5', 'IOR7',
+          // TAP straps: the chip level ties the TAP strap to rv_dm. The DFT
+          // strap pads (IOR5, IOR7) stay: without DFT enable (lc_dft_en is
+          // tied off) the pinmux never samples them, so they are GPIO pads.
+          'IOC5', 'IOC8',
         ],
 
         add_pads: [
-          // Reset from the FT2232H (PROG_D7), ANDed with the CPU reset button on POR_N.
+          // Reset from the FT2232H (ACBUS6, PROG_OEN), ANDed with the CPU reset button on POR_N.
           { name: 'IO_FTDI_RST_N',    type: 'InputStd', bank: 'VCC', connection: 'manual', desc: 'Reset from the FT2232H, active low'}
           // Enables the FT2232H channel A SPI path (PROG_SPIEN), driven high.
           { name: 'IO_SPIEN',         type: 'BidirStd', bank: 'VCC', connection: 'manual', desc: 'FT2232H SPI enable output'}
@@ -1161,8 +1163,9 @@
 
       pinmux: {
         special_signals: [
-          // Straps: the pads are removed above, and the chip level ties the
-          // TAP strap to select rv_dm.
+          // Straps: the TAP strap pads are removed above, and the chip level
+          // ties the TAP strap to select rv_dm. The DFT straps are never
+          // sampled (no DFT enable), so their pads are ordinary GPIO pads.
           { name: 'tap0',   pad: 'IOC8', desc: 'TAP strap signal.'   },
           { name: 'tap1',   pad: 'IOC5', desc: 'TAP strap signal.'   },
           { name: 'dft0',   pad: 'IOR5', desc: 'DFT strap signal.'   },
