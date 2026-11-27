@@ -1138,9 +1138,9 @@
           'CC1', 'CC2',
           'FLASH_TEST_VOLT',
           'FLASH_TEST_MODE0', 'FLASH_TEST_MODE1',
-          // spi_host0 goes to the on-board flash in a later step (its SCK needs STARTUPE2).
-          'SPI_HOST_CLK', 'SPI_HOST_CS_L',
-          'SPI_HOST_D0', 'SPI_HOST_D1', 'SPI_HOST_D2', 'SPI_HOST_D3',
+          // spi_host0 drives the on-board flash. Its SCK is the FPGA's
+          // dedicated CCLK pin, which the chip level drives through STARTUPE2.
+          'SPI_HOST_CLK',
           // The FT2232H's DSPI port carries single-lane SPI only.
           'SPI_DEV_D2', 'SPI_DEV_D3',
           // TAP straps: the chip level ties the TAP strap to rv_dm. The DFT

@@ -74,6 +74,14 @@ set_property -dict { PACKAGE_PIN AB22  IOSTANDARD LVCMOS33 } [get_ports { IOA4 }
 set_property -dict { PACKAGE_PIN AF17  IOSTANDARD LVCMOS18 } [get_ports { IOA3 }]; # OLED_SCLK
 set_property -dict { PACKAGE_PIN Y15   IOSTANDARD LVCMOS18 } [get_ports { IOA5 }]; # OLED_SDIN
 
+## spi_host0: on-board Quad-SPI flash (Spansion S25FL256S), the FPGA's
+## configuration flash. SCK is CCLK, driven through STARTUPE2 (no pin here).
+set_property -dict { PACKAGE_PIN U19   IOSTANDARD LVCMOS33 } [get_ports { SPI_HOST_CS_L }];
+set_property -dict { PACKAGE_PIN P24   IOSTANDARD LVCMOS33 } [get_ports { SPI_HOST_D0 }];
+set_property -dict { PACKAGE_PIN R25   IOSTANDARD LVCMOS33 } [get_ports { SPI_HOST_D1 }];
+set_property -dict { PACKAGE_PIN R20   IOSTANDARD LVCMOS33 } [get_ports { SPI_HOST_D2 }];
+set_property -dict { PACKAGE_PIN R21   IOSTANDARD LVCMOS33 } [get_ports { SPI_HOST_D3 }];
+
 ## uart0: on-board USB UART (FT232R)
 set_property -dict { PACKAGE_PIN Y20   IOSTANDARD LVCMOS33 } [get_ports { IOC3 }]; # RX
 set_property -dict { PACKAGE_PIN Y23   IOSTANDARD LVCMOS33 } [get_ports { IOC4 }]; # TX

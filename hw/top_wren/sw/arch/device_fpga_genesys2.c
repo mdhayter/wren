@@ -31,6 +31,8 @@ uint64_t to_cpu_cycles(uint64_t usec) { return usec * kClockFreqCpuMhz; }
 
 const uint64_t kClockFreqPeripheralHz = 25 * 100 * 1000;  // 2.5MHz
 
+const uint64_t kClockFreqHiSpeedPeripheralHz = 10 * 1000 * 1000;  // 10MHz (IO)
+
 const uint64_t kClockFreqUsbHz = 48 * 1000 * 1000;  // 48MHz
 
 const uint64_t kClockFreqAonHz = 250 * 1000;  // 250kHz

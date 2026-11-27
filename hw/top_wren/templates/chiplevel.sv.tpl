@@ -375,6 +375,13 @@ module chip_${top["name"]}_${target["name"]} #(
   // Other board connections //
   ////////////////////////////
 
+  // spi_host0's SCK to the configuration flash: CCLK is a dedicated pin, so
+  // its pad is removed and the clock goes through STARTUPE2.
+  startup_xil7series u_startup (
+    .usrcclk_i    (dio_out[DioSpiHost0Sck]),
+    .usrcclk_en_i (dio_oe[DioSpiHost0Sck])
+  );
+
   // FT2232H channel A SPI enable (PROG_SPIEN): drive high, as Mocha does.
   assign manual_out_io_spien = 1'b1;
   assign manual_oe_io_spien = 1'b1;

@@ -20,6 +20,7 @@ filesets:
     files:
       - rtl/clkgen_xil7series.sv
       - rtl/usr_access_xil7series.sv
+      - rtl/startup_xil7series.sv
       - rtl/autogen/chip_wren_genesys2.sv
     file_type: systemVerilogSource
 
